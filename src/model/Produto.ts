@@ -132,9 +132,7 @@ class Produto {
             );
 
             if (codigoExists.rows.length > 0) {
-                console.warn(
-                    `Tentativa de cadastrar código duplicado: ${Produto.codigo}`
-                );
+                console.warn(`Tentativa de cadastrar código duplicado: ${Produto.codigo}`);
 
                 return false;
             }
@@ -159,17 +157,12 @@ class Produto {
                 ]
             );
 
-            console.info(
-                `Produto cadastrado com sucesso. ${respostaBD.command}`
-            );
+            console.info(`Produto cadastrado com sucesso. ${respostaBD.command}`);
 
             return true;
-
         } catch (error) {
 
-            console.error(
-                `Erro ao cadastrar Produto no banco de dados: ${error}`
-            );
+            console.error(`Erro ao cadastrar Produto no banco de dados: ${error}`);
 
             return false;
         }
@@ -181,24 +174,10 @@ class Produto {
             const listaProdutos: Array<Produto> = [];
 
             const querySelectProdutos = `
-                SELECT
-                    id_produto,
-                    id_categoria,
-                    codigo,
-                    nome,
-                    descricao,
-                    preco_unitario,
-                    quantidade_disponivel,
-                    quantidade_minima,
-                    data_cadastro,
-                    ativo
-                FROM produto
-                ORDER BY nome ASC;
+                SELECT * FROM produto
             `;
 
-            const respostaBD = await database.query(
-                querySelectProdutos
-            );
+            const respostaBD = await database.query(querySelectProdutos);
 
             respostaBD.rows.forEach((ProdutoBD) => {
 
@@ -207,38 +186,28 @@ class Produto {
                     ProdutoBD.codigo,
                     ProdutoBD.nome,
                     ProdutoBD.descricao,
-                    Number(ProdutoBD.preco_unitario),
+                    ProdutoBD.preco_unitario,
                     ProdutoBD.quantidade_disponivel,
                     ProdutoBD.data_cadastro,
                     ProdutoBD.ativo
                 );
 
-                novo.setIdProduto(
-                    ProdutoBD.id_produto
-                );
-
-                novo.setQuantidadeMinima(
-                    ProdutoBD.quantidade_minima
-                );
+                novo.setIdProduto(ProdutoBD.id_produto);
+                novo.setQuantidadeMinima(ProdutoBD.quantidade_minima);
 
                 listaProdutos.push(novo);
             });
 
             return listaProdutos;
-
         } catch (error) {
 
-            console.error(
-                `Erro ao listar Produtos: ${error}`
-            );
+            console.error(`Erro ao listar Produtos: ${error}`);
 
             return null;
         }
     }
 
-    static async listarProduto(
-        idProduto: number
-    ): Promise<Produto | null> {
+    static async listarProduto(idProduto: number): Promise<Produto | null> {
 
         try {
 
@@ -258,12 +227,8 @@ class Produto {
                 WHERE id_produto = $1;
             `;
 
-            const respostaBD = await database.query(
-                querySelectProduto,
-                [idProduto]
-            );
+            const respostaBD = await database.query(querySelectProduto, [idProduto]);
 
-            // Produto não encontrado
             if (respostaBD.rows.length === 0) {
                 return null;
             }
@@ -275,36 +240,26 @@ class Produto {
                 ProdutoBD.codigo,
                 ProdutoBD.nome,
                 ProdutoBD.descricao,
-                Number(ProdutoBD.preco_unitario),
+                ProdutoBD.preco_unitario,
                 ProdutoBD.quantidade_disponivel,
                 ProdutoBD.data_cadastro,
                 ProdutoBD.ativo
             );
 
-            novoProduto.setIdProduto(
-                ProdutoBD.id_produto
-            );
+            novoProduto.setIdProduto(ProdutoBD.id_produto);
 
-            novoProduto.setQuantidadeMinima(
-                ProdutoBD.quantidade_minima
-            );
+            novoProduto.setQuantidadeMinima(ProdutoBD.quantidade_minima);
 
             return novoProduto;
-
         } catch (error) {
 
-            console.error(
-                `Erro ao buscar Produto no banco de dados: ${error}`
-            );
+            console.error(`Erro ao buscar Produto no banco de dados: ${error}`);
 
             return null;
         }
     }
 
-    static async deletarProduto(
-        idProduto: number
-    ): Promise<boolean> {
-
+    static async deletarProduto(idProduto: number): Promise<boolean> {
         try {
 
             const queryDeleteProduto = `
@@ -314,30 +269,22 @@ class Produto {
                 AND ativo = TRUE;
             `;
 
-            const respostaBD = await database.query(
-                queryDeleteProduto,
-                [idProduto]
-            );
+            const respostaBD = await database.query(queryDeleteProduto, [idProduto]);
 
             if (
                 respostaBD.rowCount !== null &&
                 respostaBD.rowCount > 0
             ) {
 
-                console.info(
-                    `Produto desativado com sucesso.`
-                );
+                console.info(`Produto desativado com sucesso.`);
 
                 return true;
             }
 
             return false;
-
         } catch (error) {
 
-            console.error(
-                `Erro ao desativar Produto no banco de dados: ${error}`
-            );
+            console.error(`Erro ao desativar Produto no banco de dados: ${error}`);
 
             return false;
         }
@@ -350,8 +297,7 @@ class Produto {
                 SELECT id_produto FROM produto WHERE codigo = $1 AND id_produto != $2;
             `;
 
-            const checkCodigoResult = await database.query(
-                checkCodigoSql,
+            const checkCodigoResult = await database.query(checkCodigoSql,
                 [
                     Produto.getCodigo(),
                     Produto.getIdProduto()
@@ -359,10 +305,7 @@ class Produto {
             );
 
             if (checkCodigoResult.rows.length > 0) {
-
-                console.error(
-                    `Código ${Produto.getCodigo()} já existe em outro Produto`
-                );
+                console.error(`Código ${Produto.getCodigo()} já existe em outro Produto`);
 
                 return false;
             }
