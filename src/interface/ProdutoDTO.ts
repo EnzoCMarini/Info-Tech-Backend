@@ -11,5 +11,5 @@ export interface ProdutoDTO {
     quantidadeDisponivel: number;
     quantidadeMinima: number;
     dataCadastro: Date;
-    ativo?: boolean;
+    ativo: boolean;
 }

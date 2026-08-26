@@ -16,21 +16,23 @@ class ProdutoController {
 
     static async novo(req: Request, res: Response): Promise<Response> {
         try {
-            const dadosRecebidosProduto: ProdutoDTO = req.body;
 
-            if (!dadosRecebidosProduto?.idCategoria || !dadosRecebidosProduto?.codigo || !dadosRecebidosProduto?.nome || dadosRecebidosProduto?.precoUnitario === undefined || dadosRecebidosProduto?.quantidadeDisponivel === undefined || !dadosRecebidosProduto?.dataCadastro) {
-                return res.status(400).json({ mensagem: "Dados do produto inválidos. Verifique categoria, código, nome, preço, quantidade e data de cadastro." });
-            }
+            const dadosRecebidosProduto: ProdutoDTO = req.body;
 
             const respostaModelo = await Produto.cadastrarProduto(dadosRecebidosProduto);
 
             if (respostaModelo) {
+                // Status 201 para novo registro
                 return res.status(201).json({ mensagem: "Produto cadastrado com sucesso." });
+            } else {
+                // Status 400 para erro de cadastro
+                return res.status(400).json({ mensagem: "Erro ao cadastrar Produto. Verifique os dados." });
             }
-
-            return res.status(400).json({ mensagem: "Erro ao cadastrar Produto. Verifique os dados." });
         } catch (error) {
+            // Log de erro inesperado
             console.error(`Erro no processamento do modelo: ${error}`);
+
+            // Status 500 para erro interno
             return res.status(500).json({ mensagem: "Não foi possível inserir o Produto devido a um erro interno." });
         }
     }
@@ -73,13 +75,13 @@ class ProdutoController {
     }
 
     static async atualizar(req: Request, res: Response): Promise<Response> {
+
         try {
             const idProduto = Number(req.params.idProduto ?? req.params.id);
 
-            if (Number.isNaN(idProduto) || idProduto <= 0) {
-                return res.status(400).json({
-                    mensagem: "ID inválido. A atualização requer um identificador numérico válido."
-                });
+            if (isNaN(idProduto)) {
+
+                return res.status(400).json({ mensagem: "ID inválido. A atualização requer um identificador numérico." });
             }
 
             const {
@@ -94,13 +96,19 @@ class ProdutoController {
                 ativo
             }: ProdutoDTO = req.body;
 
-            if (!idCategoria || !codigo || !nome || precoUnitario === undefined || quantidadeDisponivel === undefined || !dataCadastro) {
-                return res.status(400).json({
-                    mensagem: "Categoria, código, nome, preço unitário, quantidade disponível e data de cadastro são obrigatórios."
-                });
+            if (
+                !idCategoria ||
+                !codigo ||
+                !nome ||
+                precoUnitario === undefined ||
+                quantidadeDisponivel === undefined ||
+                !dataCadastro
+            ) {
+
+                return res.status(400).json({ mensagem: "Categoria, código, nome, preço unitário, quantidade disponível e data de cadastro são obrigatórios." });
             }
 
-            const produtoAtualizado = new Produto(
+            const produto = new Produto(
                 idCategoria,
                 codigo,
                 nome,
@@ -111,26 +119,32 @@ class ProdutoController {
                 ativo ?? true
             );
 
-            produtoAtualizado.setIdProduto(idProduto);
-            produtoAtualizado.setQuantidadeMinima(Number(quantidadeMinima ?? 0));
+            produto.setIdProduto(idProduto);
 
-            const result = await Produto.atualizarProduto(produtoAtualizado);
+            produto.setQuantidadeMinima(
+                Number(quantidadeMinima ?? 0)
+            );
+
+            const result = await Produto.atualizarProduto(produto);
 
             if (result) {
+
                 return res.status(200).json({ mensagem: "Produto atualizado com sucesso." });
+
             }
 
             return res.status(400).json({
                 mensagem: "Falha na atualização: código já existe em outro produto ou produto não encontrado."
             });
+
+
         } catch (error) {
-            console.error(`[ERRO NA ATUALIZAÇÃO DO PRODUTO]: ${error}`);
-            return res.status(500).json({
-                mensagem: "Erro interno ao atualizar os dados do Produto."
-            });
+
+            console.error(`[ERRO NA ATUALIZAÇÃO DE PRODUTO]: ${error}`);
+
+            return res.status(500).json({ mensagem: "Erro interno ao atualizar os dados do Produto." });
         }
     }
 }
 
-export { ProdutoController };
 export default ProdutoController;

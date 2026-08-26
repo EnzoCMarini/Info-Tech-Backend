@@ -137,8 +137,8 @@ class Produto {
                 return false;
             }
 
-            const queryInsertProduto = `
-                INSERT INTO produto (id_categoria, codigo, nome, descricao, preco_unitario, quantidade_disponivel, quantidade_minima, ativo, data_cadastro)VALUES 
+                const queryInsertProduto = `
+                INSERT INTO Produto (id_categoria, codigo, nome, descricao, preco_unitario, quantidade_disponivel, quantidade_minima, ativo, data_cadastro)VALUES 
                 ($1, $2, $3, $4, $5, $6, $7, $8, $9);
             `;
 
@@ -150,10 +150,10 @@ class Produto {
                     Produto.nome,
                     Produto.descricao || "",
                     Produto.precoUnitario,
-                    Produto.quantidadeDisponivel,
+                    Produto.quantidadeDisponivel ?? 0,
                     Produto.quantidadeMinima ?? 0,
-                    Produto.ativo ?? true,
-                    Produto.dataCadastro ?? new Date()
+                    Produto.ativo,
+                    Produto.dataCadastro
                 ]
             );
 
@@ -318,10 +318,11 @@ class Produto {
                     nome = $3,
                     descricao = $4,
                     preco_unitario = $5,
-                    quantidade_minima = $6,
-                    data_cadastro = $7,
-                    ativo = $8
-                WHERE id_produto = $9;
+                    quantidade_disponivel = $6,
+                    quantidade_minima = $7
+                    data_cadastro = $8,
+                    ativo = $9
+                WHERE id_produto = $10;
             `;
 
             const valores = [
@@ -330,6 +331,7 @@ class Produto {
                 Produto.getNome(),
                 Produto.getDescricao() || "",
                 Produto.getPrecoUnitario(),
+                Produto.getQuantidadeDisponivel(),
                 Produto.getQuantidadeMinima(),
                 Produto.getDataCadastro(),
                 Produto.getAtivo(),
