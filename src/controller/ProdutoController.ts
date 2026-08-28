@@ -37,7 +37,7 @@ class ProdutoController {
         }
     }
 
-    static async Produto(req: Request, res: Response): Promise<Response> {
+    static async produto(req: Request, res: Response): Promise<Response> {
         try {
             const idProduto = Number(req.params.idProduto);
 
@@ -69,18 +69,16 @@ class ProdutoController {
 
             return res.status(404).json({ mensagem: "Produto não encontrado para exclusão." });
         } catch (error) {
-            console.error(`Erro ao remover o Produto. ${error}`);
-            return res.status(500).json({ mensagem: "Erro ao remover o Produto." });
+            console.error(`Erro ao remover o produto. ${error}`);
+            return res.status(500).json({ mensagem: "Erro ao remover o produto." });
         }
     }
 
     static async atualizar(req: Request, res: Response): Promise<Response> {
-
         try {
             const idProduto = Number(req.params.idProduto ?? req.params.id);
 
             if (isNaN(idProduto)) {
-
                 return res.status(400).json({ mensagem: "ID inválido. A atualização requer um identificador numérico." });
             }
 
@@ -94,7 +92,7 @@ class ProdutoController {
                 quantidadeMinima,
                 dataCadastro,
                 ativo
-            }: ProdutoDTO = req.body;
+            } = req.body;
 
             if (
                 !idCategoria ||
@@ -104,15 +102,14 @@ class ProdutoController {
                 quantidadeDisponivel === undefined ||
                 !dataCadastro
             ) {
-
-                return res.status(400).json({ mensagem: "Categoria, código, nome, preço unitário, quantidade disponível e data de cadastro são obrigatórios." });
+                return res.status(400).json({ mensagem: "Erro ao atualizar produto. Verifique os dados." });
             }
 
             const produto = new Produto(
                 idCategoria,
                 codigo,
                 nome,
-                descricao ?? "",
+                descricao,
                 Number(precoUnitario),
                 Number(quantidadeDisponivel),
                 new Date(dataCadastro),
@@ -120,29 +117,19 @@ class ProdutoController {
             );
 
             produto.setIdProduto(idProduto);
-
-            produto.setQuantidadeMinima(
-                Number(quantidadeMinima ?? 0)
-            );
+            produto.setQuantidadeMinima(Number(quantidadeMinima ?? 0));
 
             const result = await Produto.atualizarProduto(produto);
 
             if (result) {
-
                 return res.status(200).json({ mensagem: "Produto atualizado com sucesso." });
-
             }
 
-            return res.status(400).json({
-                mensagem: "Falha na atualização: código já existe em outro produto ou produto não encontrado."
-            });
-
-
+            return res.status(400).json({ mensagem: "Falha na atualização: código já existe em outro produto ou produto não encontrado." });
         } catch (error) {
-
             console.error(`[ERRO NA ATUALIZAÇÃO DE PRODUTO]: ${error}`);
 
-            return res.status(500).json({ mensagem: "Erro interno ao atualizar os dados do Produto." });
+            return res.status(500).json({ mensagem: "Erro interno ao atualizar os dados do produto." });
         }
     }
 }

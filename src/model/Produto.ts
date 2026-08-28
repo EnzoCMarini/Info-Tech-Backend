@@ -118,7 +118,6 @@ class Produto {
 
     static async cadastrarProduto(Produto: ProdutoDTO): Promise<boolean> {
         try {
-
             // Verifica se o código já existe
             const checkCodigoSql = `
                 SELECT 1
@@ -137,7 +136,7 @@ class Produto {
                 return false;
             }
 
-                const queryInsertProduto = `
+            const queryInsertProduto = `
                 INSERT INTO Produto (id_categoria, codigo, nome, descricao, preco_unitario, quantidade_disponivel, quantidade_minima, ativo, data_cadastro)VALUES 
                 ($1, $2, $3, $4, $5, $6, $7, $8, $9);
             `;
@@ -161,7 +160,6 @@ class Produto {
 
             return true;
         } catch (error) {
-
             console.error(`Erro ao cadastrar Produto no banco de dados: ${error}`);
 
             return false;
@@ -170,7 +168,6 @@ class Produto {
 
     static async listarProdutos(): Promise<Array<Produto> | null> {
         try {
-
             const listaProdutos: Array<Produto> = [];
 
             const querySelectProdutos = `
@@ -208,9 +205,7 @@ class Produto {
     }
 
     static async listarProduto(idProduto: number): Promise<Produto | null> {
-
         try {
-
             const querySelectProduto = `
                 SELECT
                     id_produto,
@@ -247,12 +242,10 @@ class Produto {
             );
 
             novoProduto.setIdProduto(ProdutoBD.id_produto);
-
             novoProduto.setQuantidadeMinima(ProdutoBD.quantidade_minima);
 
             return novoProduto;
         } catch (error) {
-
             console.error(`Erro ao buscar Produto no banco de dados: ${error}`);
 
             return null;
@@ -261,7 +254,6 @@ class Produto {
 
     static async deletarProduto(idProduto: number): Promise<boolean> {
         try {
-
             const queryDeleteProduto = `
                 UPDATE produto
                 SET ativo = FALSE
@@ -275,7 +267,6 @@ class Produto {
                 respostaBD.rowCount !== null &&
                 respostaBD.rowCount > 0
             ) {
-
                 console.info(`Produto desativado com sucesso.`);
 
                 return true;
@@ -283,7 +274,6 @@ class Produto {
 
             return false;
         } catch (error) {
-
             console.error(`Erro ao desativar Produto no banco de dados: ${error}`);
 
             return false;

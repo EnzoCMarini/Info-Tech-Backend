@@ -1,6 +1,3 @@
-/**
- * Interface DTO para transferência de dados do Paciente
- */
 export interface ProdutoDTO {
     idProduto?: number;
     idCategoria: number;
