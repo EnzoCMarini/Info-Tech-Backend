@@ -1,20 +1,24 @@
-import { DatabaseModel } from "./model/DatabaseModel.js";
+import { database } from "./model/DatabaseModel.js";
 import { server } from "./server.js";
 
 const port: number = 3333; //Define a porta que o servidor vai executar
 
-//Liga o servidor HTTP
-server.listen(port, () => {
-    console.log(`Servidor executando no endereço: http://localhost:${port}`);
-});
+async function iniciarServidor(): Promise<void> {
+    const conexaoEstabelecida = await database.testeConexao();
 
-// No momento, a verificação de conexão com o banco de dados está desativada
-new DatabaseModel().testeConexao().then((resbd) => {
-    if (resbd) {
-        server.listen(port, () => {
-            console.log(`Servidor rodando em http://localhost:${port}`);
-        })
-    } else {
-        console.log('Não foi possível conectar ao banco de dados');
+    if (!conexaoEstabelecida) {
+        await database.pool.end();
+        process.exitCode = 1;
+        return;
     }
+
+    server.listen(port, () => {
+        console.log(`Servidor rodando em http://localhost:${port}`);
+    });
+}
+
+void iniciarServidor().catch(async (error: unknown) => {
+    console.error("Não foi possível iniciar o servidor:", error);
+    await database.pool.end();
+    process.exitCode = 1;
 });

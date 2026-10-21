@@ -11,7 +11,7 @@ export class DatabaseModel {
     /**
      * Configuração para conexão com o banco de dados
      */
-    private _config: object;
+    private _config: pg.PoolConfig;
 
     /**
      * Pool de conexões com o banco de dados
@@ -19,30 +19,24 @@ export class DatabaseModel {
     private _pool: pg.Pool;
 
     /**
-     * Cliente de conexão com o banco de dados
-     */
-    private _client: pg.Client;
-
-    /**
      * Construtor da classe DatabaseModel.
      */
     constructor() {
+        const port = process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432;
+
         // Configuração padrão para conexão com o banco de dados
         this._config = {
             user: process.env.DB_USER,
             host: process.env.DB_HOST,
             database: process.env.DB_NAME,
             password: process.env.DB_PASSWORD,
-            port: process.env.DB_PORT,
+            port: Number.isInteger(port) && port > 0 ? port : undefined,
             max: 10,
-            idleTimoutMillis: 10000
+            idleTimeoutMillis: 10000
         }
 
         // Inicialização do pool de conexões
         this._pool = new pg.Pool(this._config);
-
-        // Inicialização do cliente de conexão
-        this._client = new pg.Client(this._config);
     }
 
     /**
@@ -52,18 +46,22 @@ export class DatabaseModel {
      */
     public async testeConexao() {
         try {
-            // Tenta conectar ao banco de dados
-            await this._client.connect();
+            const requiredVariables = ["DB_USER", "DB_HOST", "DB_NAME", "DB_PASSWORD"];
+            const missingVariables = requiredVariables.filter((variable) => !process.env[variable]);
+
+            if (missingVariables.length > 0) {
+                throw new Error(`Variáveis de ambiente ausentes: ${missingVariables.join(", ")}`);
+            }
+
+            if (this._config.port === undefined) {
+                throw new Error("DB_PORT deve ser um número inteiro positivo.");
+            }
+
+            await this._pool.query("SELECT 1");
             console.log('Database connected!');
-            // Encerra a conexão
-            this._client.end();
             return true;
         } catch (error) {
-            // Em caso de erro, exibe uma mensagem de erro
-            console.log('Error to connect database X( ');
-            console.log(error);
-            // Encerra a conexão
-            this._client.end();
+            console.error('Erro ao conectar ao banco de dados:', error);
             return false;
         }
     }
@@ -75,3 +73,5 @@ export class DatabaseModel {
         return this._pool;
     }
 }
+
+export const database = new DatabaseModel();
