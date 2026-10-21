@@ -1,7 +1,7 @@
-import { DatabaseModel } from "./DatabaseModel.js";
+import { database as databaseModel } from "./DatabaseModel.js";
 import { type ProdutoDTO } from "../interface/ProdutoDTO.js";
 
-const database = new DatabaseModel().pool;
+const database = databaseModel.pool;
 
 class Produto {
     private idProduto: number = 0;
@@ -171,7 +171,7 @@ class Produto {
             const listaProdutos: Array<Produto> = [];
 
             const querySelectProdutos = `
-                SELECT * FROM produto
+                SELECT * FROM vw_valor_produto_estoque;
             `;
 
             const respostaBD = await database.query(querySelectProdutos);
