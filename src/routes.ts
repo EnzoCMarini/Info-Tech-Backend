@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import ProdutoController from "./controller/ProdutoController.js";
 import CategoriaController from "./controller/CategoriaController.js";
+import MovimentacaoController from "./controller/MovimentacaoController.js";
 
 const router = Router();
 
@@ -30,5 +31,12 @@ router.get("/api/categorias/:idCategoria", CategoriaController.categoria);
 router.get("/api/categorias/:idCategoria", CategoriaController.remover);
 // Atuliza uma Categoria
 router.put("/api/categorias/:idCategoria", CategoriaController.atualizar)
+
+// Rotas de movimentação de estoque
+router.get("/api/movimentacao", MovimentacaoController.todos);
+router.post("/api/movimentacao", MovimentacaoController.novo);
+router.get("/api/movimentacao/:idMovimentacao", MovimentacaoController.Movimentacao);
+router.delete("/api/movimentacao/:idMovimentacao", MovimentacaoController.remover);
+router.put("/api/movimentacao/:idMovimentacao", MovimentacaoController.atualizar);
 
 export { router };
