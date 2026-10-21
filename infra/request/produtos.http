@@ -1,0 +1,43 @@
+### Testar lista de produtos
+GET http://localhost:3333/api/produtos
+Accept: application/json
+
+### Testar criar produto
+POST http://localhost:3333/api/produtos
+Content-Type: application/json
+
+{
+    "idCategoria": 1,
+    "codigo": "PER-003",
+    "nome": "Mouse Bluetooth",
+    "descricao": "Mouse óptico com conexão por Bluetooth",
+    "precoUnitario": 59.9,
+    "quantidadeDisponivel": 20,
+    "quantidadeMinima": 5,
+    "ativo": true,
+    "dataCadastro": "2026-02-06"
+}
+
+### Testar buscar produto por ID
+GET http://localhost:3333/api/produtos/6
+Accept: application/json
+
+### Testar atualizar produto
+PUT http://localhost:3333/api/produtos/5
+Content-Type: application/json
+
+{
+    "idCategoria": 4,
+    "codigo": "CAB-001",
+    "nome": "Cabo HDMI",
+    "descricao": "Cabo HDMI de 2 metros",
+    "precoUnitario": 39.9,
+    "quantidadeDisponivel": 11,
+    "quantidadeMinima": 6,
+    "dataCadastro": "2026-08-21T14:40:44.203Z",
+    "ativo": true
+}
+
+### Testar deletar produto
+DELETE http://localhost:3333/api/produtos/5
+Accept: application/json
