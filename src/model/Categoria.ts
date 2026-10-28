@@ -1,7 +1,7 @@
-import { database as databaseModel } from "./DatabaseModel.js";
+import { DatabaseModel } from "./DatabaseModel.js";
 import { type CategoriaDTO } from "../interface/CategoriaDTO.js";
 
-const database = databaseModel.pool;
+const database = new DatabaseModel().pool;
 
 class Categoria {
     private idCategoria: number = 0;
